@@ -28,6 +28,43 @@ namespace ThothGui
         }
     }
 
+    class InputDialog : Dialog<string>
+    {
+        private TextArea _text;
+        private Button _acceptButton;
+
+        public InputDialog()
+        {
+            _text = new TextArea();
+            _acceptButton = new Button { Text = "Ok" };
+            _acceptButton.Click += _acceptButton_Click;
+            //Size = new Eto.Drawing.Size(300, 100);
+            Width = 400;
+            Result = "";            
+
+            Content = new TableLayout
+            {
+                Rows =
+                {
+                    new Label { Text = "Manually Input URLS" },
+                    _text,
+                    _acceptButton
+                }
+            };
+        }
+
+        private void _acceptButton_Click(object sender, EventArgs e)
+        {
+            this.Close(_text.Text);
+        }
+
+        public void Reset()
+        {
+            Result = "";
+            _text.Text = "";
+        }
+    }
+
     class PasteBox : TableLayout
     {
 
@@ -36,7 +73,9 @@ namespace ThothGui
         private Button _upButton;
         private Button _downButton;
         private Button _deleteButton;
+        private Button _manualButton;
         private TableLayout _buttonLayout;
+        private InputDialog _manualInputDialog;
 
         public PasteBox()
         {
@@ -44,8 +83,9 @@ namespace ThothGui
             _upButton = new Button { Text = "Move Up" };
             _downButton = new Button { Text = "Move Down" };
             _deleteButton = new Button { Text = "Delete" };
-            _buttonLayout = new TableLayout { Rows = { _upButton, _downButton, _deleteButton} };
-
+            _manualButton = new Button { Text = "Manually Input URLs" };
+            _buttonLayout = new TableLayout { Rows = { _upButton, _downButton, _deleteButton, _manualButton} };
+            _manualInputDialog = new InputDialog();
 
             _box.BindDataContext((c) => c.DataStore, (List<URL> m) => m);
             _urls = new List<URL>();
@@ -94,6 +134,26 @@ namespace ThothGui
                     DeleteURL(selectedURL);
                 }
             };
+
+            _manualButton.Click += (object o, EventArgs e) =>
+            {
+                _manualInputDialog.Reset();
+                _manualInputDialog.ShowModal();
+            };
+
+            _manualInputDialog.Closed += _manualInputDialog_Closed;
+        }
+
+        private void _manualInputDialog_Closed(object sender, EventArgs e)
+        {
+            var text = _manualInputDialog.Result;
+            if (text != "")
+            {
+                var lines = text.Split(new string[] { "\n" }, StringSplitOptions.None);
+                var urls = lines.Select(x => new URL(x, x));
+                _urls.AddRange(urls);
+                updateDisplay();
+            }
         }
 
         private void DeleteKeyHandler(object sender, KeyEventArgs e)

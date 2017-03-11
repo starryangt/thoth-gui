@@ -31,15 +31,14 @@ namespace ThothGui
 
         public void Down()
         {
-            //if (Done) return;
 
-
-            //First, if the cover exist, save it
             if (_cover != null)
             {
                 File.WriteAllBytes("Cover.png", _cover.ToByteArray(ImageFormat.Jpeg));
             }
             var stringUrls = _urls;
+           
+            Download.CheckAndDeleteDirectory("temp");
             if (_cover == null)
             {
                 Process.EbookFromListDefault(false, _title, _author, "", stringUrls);
@@ -64,10 +63,9 @@ namespace ThothGui
         private ThothConsole _console;
         private MetadataInput _input;
         private Button _downloadButton;
+        private Dialog<string> _test;
 
         private bool _downloadRunning = false;
-
-        private ThothDownloadThread _downloadThread;
 
         public Thoth()
         {
@@ -78,6 +76,7 @@ namespace ThothGui
             _console = new ThothConsole();
             _downloadButton = new Button { Text = "Download" };
             _input = new MetadataInput();
+            _test = new Dialog<string>();
 
             Console.SetOut(_console.Writer);
 
@@ -101,6 +100,11 @@ namespace ThothGui
             Content = layout;
 
             BindHandlers();
+        }
+
+        private void _test_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _test.Result = "hi";
         }
 
         private void BindHandlers()

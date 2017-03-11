@@ -60,6 +60,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Console.cs" />
+    <Compile Include="CoverView.cs" />
     <Compile Include="MetadataInput.cs" />
     <Compile Include="PasteBox.cs" />
     <Compile Include="Program.cs" />

@@ -28,24 +28,79 @@ namespace ThothGui
         }
     }
 
-    class PasteBox : ListBox
+    class PasteBox : TableLayout
     {
 
         private List<URL> _urls;
+        private ListBox _box;
+        private Button _upButton;
+        private Button _downButton;
+        private Button _deleteButton;
+        private TableLayout _buttonLayout;
+
         public PasteBox()
         {
-            this.BindDataContext((c) => c.DataStore, (List<URL> m) => m);
+            _box = new ListBox();
+            _upButton = new Button { Text = "Move Up" };
+            _downButton = new Button { Text = "Move Down" };
+            _deleteButton = new Button { Text = "Delete" };
+            _buttonLayout = new TableLayout { Rows = { _upButton, _downButton, _deleteButton} };
+
+
+            _box.BindDataContext((c) => c.DataStore, (List<URL> m) => m);
             _urls = new List<URL>();
-            DataStore = new List<URL> { new URL("Paste URLs here", "") };
-            this.KeyDown += DeleteKeyHandler;
+            _box.DataStore = new List<URL> { new URL("Paste URLs here", "") };
+            Rows.Add(new TableRow(
+                new TableCell(_box, true),
+                new TableCell(_buttonLayout, false)));
+            Size = new Eto.Drawing.Size(300, 300);
+            BindHandlers();
+        }
+
+        public IEnumerable<URL> GetUrls()
+        {
+            return _urls;
+        }
+
+        private void BindHandlers()
+        {
+            _box.KeyDown += DeleteKeyHandler;
+            _upButton.Click += (object o, EventArgs e) =>
+            {
+                var selected = _box.SelectedValue;
+                if (selected != null && selected is URL)
+                {
+                    var selectedURL = (URL)selected;
+                    MoveURLUp(selectedURL);
+                }
+            };
+
+            _downButton.Click += (object o, EventArgs e) =>
+            {
+                var selected = _box.SelectedValue;
+                if (selected != null && selected is URL)
+                {
+                    var selectedURL = (URL)selected;
+                    MoveURLDown(selectedURL);
+                }
+            };
+
+            _deleteButton.Click += (object o, EventArgs e) =>
+            {
+                var selected = _box.SelectedValue;
+                if (selected != null && selected is URL)
+                {
+                    var selectedURL = (URL)selected;
+                    DeleteURL(selectedURL);
+                }
+            };
         }
 
         private void DeleteKeyHandler(object sender, KeyEventArgs e)
         {
             if(e.Key == Keys.Delete)
             {
-                Console.WriteLine("Delete hit");
-                var selected = this.SelectedValue;
+                var selected = _box.SelectedValue;
                 if(selected != null && selected is URL)
                 {
                     var selectedURL = (URL)selected;
@@ -67,6 +122,7 @@ namespace ThothGui
             var newIndex = (index - 1 >= 0) ? index - 1 : 0;
             _urls.Insert(newIndex, url);
             updateDisplay();
+            _box.SelectedIndex = newIndex;
         }
 
         private void MoveURLDown(URL url)
@@ -76,24 +132,18 @@ namespace ThothGui
             var newIndex = (index + 1 <= _urls.Count) ? index + 1 : _urls.Count;
             _urls.Insert(newIndex, url);
             updateDisplay();
+            _box.SelectedIndex = newIndex;
         }
 
         private void updateDisplay()
         {
-            var selected = this.SelectedValue;
-            DataStore = _urls;
-            if(selected != null)
-            {
-                //this maintains the previously selected item
-                SelectedValue = selected;
-            }
+            _box.DataStore = _urls;
         }
 
         public void ExtractPasteData(string data)
         {
             var soup = NSoup.NSoupClient.Parse(data);
             var links = soup.Body.Select("a");
-            Console.WriteLine("hey");
             foreach(var link in links)
             {
                 _urls.Add(new URL(link));

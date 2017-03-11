@@ -31,5 +31,15 @@ namespace ThothGui
             );
         }
 
+        public string GetTitle()
+        {
+            return _titlebox.Text;
+        }
+
+        public string GetAuthor()
+        {
+            return _authorbox.Text;
+        }
+
     }
 }

@@ -74,6 +74,7 @@ namespace ThothGui
         private Button _downButton;
         private Button _deleteButton;
         private Button _manualButton;
+        private Button _clearButton;
         private TableLayout _buttonLayout;
         private InputDialog _manualInputDialog;
 
@@ -84,7 +85,8 @@ namespace ThothGui
             _downButton = new Button { Text = "Move Down" };
             _deleteButton = new Button { Text = "Delete" };
             _manualButton = new Button { Text = "Manually Input URLs" };
-            _buttonLayout = new TableLayout { Rows = { _upButton, _downButton, _deleteButton, _manualButton} };
+            _clearButton = new Button { Text = "Clear" };
+            _buttonLayout = new TableLayout { Rows = { _upButton, _downButton, _deleteButton, _clearButton, _manualButton, null} };
             _manualInputDialog = new InputDialog();
 
             _box.BindDataContext((c) => c.DataStore, (List<URL> m) => m);
@@ -133,6 +135,12 @@ namespace ThothGui
                     var selectedURL = (URL)selected;
                     DeleteURL(selectedURL);
                 }
+            };
+
+            _clearButton.Click += (object o, EventArgs e) =>
+            {
+                _urls.Clear();
+                updateDisplay();
             };
 
             _manualButton.Click += (object o, EventArgs e) =>

@@ -63,6 +63,7 @@ namespace ThothGui
         private ThothConsole _console;
         private MetadataInput _input;
         private Button _downloadButton;
+        private ButtonToolItem _toolbarPaste;
         private Dialog<string> _test;
 
         private bool _downloadRunning = false;
@@ -77,8 +78,18 @@ namespace ThothGui
             _downloadButton = new Button { Text = "Download" };
             _input = new MetadataInput();
             _test = new Dialog<string>();
+            _toolbarPaste = new ButtonToolItem { Text = "Paste" };
 
             Console.SetOut(_console.Writer);
+
+            //toolbar
+            ToolBar = new ToolBar
+            {
+                Items = {
+                    _toolbarPaste,
+                    new SeparatorToolItem()
+                }
+            };
 
             var layout = new TableLayout();
             layout.Rows.Add(new TableRow(
@@ -96,6 +107,7 @@ namespace ThothGui
                     }
                 }
             ));
+            layout.Rows.Add(null);
             
             Content = layout;
 
@@ -111,7 +123,13 @@ namespace ThothGui
         {
 
             KeyDown += PasteEvent;
+            _toolbarPaste.Click += _toolbarPaste_Click;
             _downloadButton.Click += _downloadButton_Click;
+        }
+
+        private void _toolbarPaste_Click(object sender, EventArgs e)
+        {
+            HandlePaste();
         }
 
         private void _downloadButton_Click(object sender, EventArgs e)
@@ -133,15 +151,13 @@ namespace ThothGui
             }
         }
 
-        private void PasteEvent(object sender, KeyEventArgs e)
+        private void HandlePaste()
         {
-            if(e.Key == Keys.V && e.Modifiers == Keys.Control)
-            {
-                if (_clipboard.Types.Contains("HTML Format"))
+            if (_clipboard.Types.Contains("HTML Format"))
                 {
                     _pastebox.ExtractPasteData(_clipboard.Html);
                 }
-                if (_clipboard.Types.Contains("Bitmap"))
+            if (_clipboard.Types.Contains("Bitmap"))
                 {
                     if(_clipboard.Image is Bitmap)
                     {
@@ -149,6 +165,14 @@ namespace ThothGui
                         _cover.ExtractPasteData(image);
                     }
                 }
+
+        }
+
+        private void PasteEvent(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Keys.V && e.Modifiers == Keys.Control)
+            {
+                HandlePaste();
             }
         }
     }

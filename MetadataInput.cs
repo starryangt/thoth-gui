@@ -29,6 +29,7 @@ namespace ThothGui
                     new TableCell(_authorbox, true)
                 )
             );
+            Rows.Add(null);
         }
 
         public string GetTitle()

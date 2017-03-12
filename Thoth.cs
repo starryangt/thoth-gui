@@ -153,11 +153,16 @@ namespace ThothGui
 
         private void HandlePaste()
         {
+
+            foreach(var thing in _clipboard.Types)
+            {
+                Console.WriteLine(thing);
+            }
             if (_clipboard.Types.Contains("HTML Format"))
                 {
                     _pastebox.ExtractPasteData(_clipboard.Html);
                 }
-            if (_clipboard.Types.Contains("Bitmap"))
+            if (_clipboard.Types.Contains("Bitmap") || _clipboard.Types.Contains("DeviceIndependentBitmap"))
                 {
                     if(_clipboard.Image is Bitmap)
                     {

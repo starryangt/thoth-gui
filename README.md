@@ -5,6 +5,8 @@ Still a little unstable.
 
 # Usage
 
+![Usage Example](https://github.com/starrtnow/thoth-gui/raw/master/example.png)
+
 There are now two user-friendly ways to input URLs to be downloaded.
 
 1) You can simply copy links from your browser and paste it. The program will automatically detect that you've copied HTML content and parse the text as urls.

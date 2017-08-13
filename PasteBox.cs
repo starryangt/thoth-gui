@@ -75,6 +75,7 @@ namespace ThothGui
         private Button _deleteButton;
         private Button _manualButton;
         private Button _clearButton;
+        private Button _reverseButton;
         private TableLayout _buttonLayout;
         private InputDialog _manualInputDialog;
 
@@ -86,7 +87,8 @@ namespace ThothGui
             _deleteButton = new Button { Text = "Delete" };
             _manualButton = new Button { Text = "Manually Input URLs" };
             _clearButton = new Button { Text = "Clear" };
-            _buttonLayout = new TableLayout { Rows = { _upButton, _downButton, _deleteButton, _clearButton, _manualButton, null} };
+            _reverseButton = new Button { Text = "Reverse Links" };
+            _buttonLayout = new TableLayout { Rows = { _upButton, _downButton, _deleteButton, _clearButton, _reverseButton, _manualButton, null} };
             _manualInputDialog = new InputDialog();
 
             _box.BindDataContext((c) => c.DataStore, (List<URL> m) => m);
@@ -143,6 +145,12 @@ namespace ThothGui
                 updateDisplay();
             };
 
+            _reverseButton.Click += (object o, EventArgs e) =>
+            {
+                _urls.Reverse();
+                updateDisplay();
+            };
+
             _manualButton.Click += (object o, EventArgs e) =>
             {
                 _manualInputDialog.Reset();
@@ -151,7 +159,6 @@ namespace ThothGui
 
             _manualInputDialog.Closed += _manualInputDialog_Closed;
         }
-
         private void _manualInputDialog_Closed(object sender, EventArgs e)
         {
             var text = _manualInputDialog.Result;
